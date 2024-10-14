@@ -67,7 +67,7 @@ Handles user data and roles.
 ## 3. API Design
 Details of the API endpoints exposed by the backend.
 
-- **Base URL**: `https://localhost:3000`
+- **Base URL**: `http://localhost:3000`
 
 ### 3.1 Authentication Endpoints
 - **POST /auth/signup**: Register a new user.
@@ -85,11 +85,14 @@ Details of the API endpoints exposed by the backend.
 - **DELETE /comments/{id}**: Delete a comment (author only).
 
 ### 3.4 Users Endpoints
+- **GET /users**: Retrieve a list of all user profiles.
 - **GET /users/{id}**: Retrieve a user profile by ID.
-- **PUT /users/{id}**: Update a user profile (user only).
+- **PUT /users/{id}**: Update a user profile.
 
-- **Authentication**: JWT-based authentication for protected endpoints.
-- **Rate Limiting**: Rate-limiting applied to prevent abuse (e.g., max 100 requests per minute).
+<br></br>
+**Authentication**: JWT-based authentication for protected endpoints.
+
+**Rate Limiting**: Rate-limiting applied to prevent abuse (e.g., max 100 requests per minute).
 
 ---
 
