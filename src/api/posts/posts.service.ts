@@ -1,46 +1,43 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { Post } from './entities/post.entity';
 
 @Injectable()
 export class PostsService {
-  private posts = []; // Mock data
+  constructor(
+    @InjectRepository(Post)
+    private readonly postRepository: Repository<Post>,
+  ) {}
 
-  getAllPosts() {
-    return this.posts;
+  async getAllPosts(): Promise<Post[]> {
+    return this.postRepository.find();
   }
 
-  createPost(createPostDto: CreatePostDto) {
-    const newPost = {
-      id: Date.now().toString(),
-      ...createPostDto,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    this.posts.push(newPost);
-    return newPost;
+  async createPost(createPostDto: CreatePostDto): Promise<Post> {
+    const newPost = this.postRepository.create(createPostDto);
+    return this.postRepository.save(newPost);
   }
 
-  updatePost(id: string, updatePostDto: UpdatePostDto) {
-    const postIndex = this.posts.findIndex((post) => post.id === id);
-    if (postIndex === -1) {
+  async updatePost(id: string, updatePostDto: UpdatePostDto): Promise<Post> {
+    const post = await this.postRepository.findOne({ where: { id: +id } });
+    if (!post) {
       throw new NotFoundException(`Post with ID ${id} not found`);
     }
-    const updatedPost = {
-      ...this.posts[postIndex],
-      ...updatePostDto,
-      updatedAt: new Date(),
-    };
-    this.posts[postIndex] = updatedPost;
-    return updatedPost;
+
+    Object.assign(post, updatePostDto);
+    return this.postRepository.save(post);
   }
 
-  deletePost(id: string) {
-    const postIndex = this.posts.findIndex((post) => post.id === id);
-    if (postIndex === -1) {
+  async deletePost(id: string): Promise<{ message: string }> {
+    const post = await this.postRepository.findOne({ where: { id: +id } });
+    if (!post) {
       throw new NotFoundException(`Post with ID ${id} not found`);
     }
-    this.posts.splice(postIndex, 1);
+
+    await this.postRepository.remove(post);
     return { message: 'Post deleted successfully' };
   }
 }

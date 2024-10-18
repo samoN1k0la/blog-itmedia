@@ -6,33 +6,39 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/guards/roles.decorator';
 import { Role } from '../../auth/guards/role.enum';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Posts')
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Get()
+  @ApiOperation({ summary: 'Get all posts' })
   getAllPosts() {
     return this.postsService.getAllPosts();
   }
 
-  @UseGuards(RolesGuard)
-  @Roles(Role.Author, Role.Admin)
+  //@UseGuards(RolesGuard)
+  //@Roles(Role.Author, Role.Admin)
   @Post()
+  @ApiOperation({ summary: 'Create a new post' })
   createPost(@Body() createPostDto: CreatePostDto) {
     return this.postsService.createPost(createPostDto);
   }
 
-  @UseGuards(RolesGuard)
-  @Roles(Role.Author, Role.Admin)
+  //@UseGuards(RolesGuard)
+  //@Roles(Role.Author, Role.Admin)
   @Put(':id')
+  @ApiOperation({ summary: 'Update a post' })
   updatePost(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
     return this.postsService.updatePost(id, updatePostDto);
   }
 
-  @UseGuards(RolesGuard)
-  @Roles(Role.Author, Role.Admin)
+  //@UseGuards(RolesGuard)
+  //@Roles(Role.Author, Role.Admin)
   @Delete(':id')
+  @ApiOperation({ summary: 'Delete a post' })
   deletePost(@Param('id') id: string) {
     return this.postsService.deletePost(id);
   }
