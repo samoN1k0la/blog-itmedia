@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards, Query } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -15,8 +15,8 @@ export class PostsController {
 
   @Get()
   @ApiOperation({ summary: 'Get all posts' })
-  getAllPosts() {
-    return this.postsService.getAllPosts();
+  getAllPosts(@Query('page') page: number, @Query('limit') limit: number) {
+    return this.postsService.getAllPosts(page, limit);
   }
 
   //@UseGuards(RolesGuard)

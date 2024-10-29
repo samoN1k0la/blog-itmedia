@@ -12,8 +12,13 @@ export class PostsService {
     private readonly postRepository: Repository<Post>,
   ) {}
 
-  async getAllPosts(): Promise<Post[]> {
-    return this.postRepository.find();
+  async getAllPosts(page: number = 1, limit: number = 10): Promise<{ posts: Post[], total: number }> {
+    const [posts, total] = await this.postRepository.findAndCount({
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return { posts, total };
   }
 
   async createPost(createPostDto: CreatePostDto): Promise<Post> {
