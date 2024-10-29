@@ -24,8 +24,13 @@ export class UsersService {
     return await this.userRepository.findOne({ where: { email } });
   }
 
-  async getAllUsers() {
-    return await this.userRepository.find();
+  async getAllUsers(page: number = 1, limit: number = 10): Promise<{ users: User[], total: number }> {
+    const [users, total] = await this.userRepository.findAndCount({
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return { users, total };
   }
 
   async getUserById(id: string) {
@@ -40,7 +45,7 @@ export class UsersService {
   async updateUser(id: string, updateUserDto: UpdateUserDto) {
     const user = await this.getUserById(id);
 
-    if(updateUserDto.password) {
+    if (updateUserDto.password) {
       const salt = await bcrypt.genSalt();
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, salt);
     }

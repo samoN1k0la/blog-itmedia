@@ -1,4 +1,4 @@
-import { Controller, Get, Put, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Put, Param, Body, UseGuards, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -11,8 +11,8 @@ export class UsersController {
 
   @Get()
   @ApiOperation({ summary: 'Get all users' })
-  getAllUsers() {
-    return this.usersService.getAllUsers();
+  getAllUsers(@Query('page') page: number = 1, @Query('limit') limit: number = 10) {
+    return this.usersService.getAllUsers(page, limit);
   }
 
   @Get(':id')
