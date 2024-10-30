@@ -1,11 +1,7 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, Query } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-//import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { RolesGuard } from '../../auth/guards/roles.guard';
-import { Roles } from '../../auth/guards/roles.decorator';
-import { Role } from '../../auth/guards/role.enum';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Posts')
@@ -15,28 +11,22 @@ export class PostsController {
 
   @Get()
   @ApiOperation({ summary: 'Get all posts' })
-  getAllPosts(@Query('page') page: number, @Query('limit') limit: number) {
+  getAllPosts(@Query('page') page: number = 1, @Query('limit') limit: number = 10) {
     return this.postsService.getAllPosts(page, limit);
   }
 
-  //@UseGuards(RolesGuard)
-  //@Roles(Role.Author, Role.Admin)
   @Post()
   @ApiOperation({ summary: 'Create a new post' })
   createPost(@Body() createPostDto: CreatePostDto) {
     return this.postsService.createPost(createPostDto);
   }
 
-  //@UseGuards(RolesGuard)
-  //@Roles(Role.Author, Role.Admin)
   @Put(':id')
   @ApiOperation({ summary: 'Update a post' })
   updatePost(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
     return this.postsService.updatePost(id, updatePostDto);
   }
 
-  //@UseGuards(RolesGuard)
-  //@Roles(Role.Author, Role.Admin)
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a post' })
   deletePost(@Param('id') id: string) {

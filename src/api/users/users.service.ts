@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -42,15 +42,18 @@ export class UsersService {
     return user;
   }
 
-  async updateUser(id: string, updateUserDto: UpdateUserDto) {
+  async updateUser(id: string, updateUserDto: UpdateUserDto, userReq: User) {
     const user = await this.getUserById(id);
+    if (userReq.id == user.id || userReq.role == 'admin') {
+      if (updateUserDto.password) {
+        const salt = await bcrypt.genSalt();
+        updateUserDto.password = await bcrypt.hash(updateUserDto.password, salt);
+      }
 
-    if (updateUserDto.password) {
-      const salt = await bcrypt.genSalt();
-      updateUserDto.password = await bcrypt.hash(updateUserDto.password, salt);
+      Object.assign(user, updateUserDto, { updatedAt: new Date() });
+      return await this.userRepository.save(user);
+    } else {
+      throw new UnauthorizedException('You are not authorized to perform this action');
     }
-
-    Object.assign(user, updateUserDto, { updatedAt: new Date() });
-    return await this.userRepository.save(user);
   }
 }

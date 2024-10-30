@@ -1,8 +1,12 @@
-import { Controller, Get, Put, Param, Body, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Put, Param, Body, Query, UseGuards, Request, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-//import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../../auth/guards/roles.guard';
+import { JwtAuthGuard } from '../../auth/guards/jtw-auth.guard';
+import { Roles } from '../../auth/guards/roles.decorator';
+import { Role } from '../../auth/guards/role.enum';
+
 
 @ApiTags('Users')
 @Controller('users')
@@ -21,10 +25,12 @@ export class UsersController {
     return this.usersService.getUserById(id);
   }
 
-  //@UseGuards(JwtAuthGuard)
   @Put(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Admin, Role.Author)
   @ApiOperation({ summary: 'Update user by ID. Uses UpdateUserDto schema.' })
-  updateUser(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.updateUser(id, updateUserDto);
+  updateUser(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @Request() req: any) {
+    const user = req.user;
+    return this.usersService.updateUser(id, updateUserDto, user);
   }
 }
