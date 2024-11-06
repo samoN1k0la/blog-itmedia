@@ -13,16 +13,18 @@ export class AuthService {
   ) {}
 
   async register(createUserDto: CreateUserDto) {
+    const existingUser = await this.usersService.findByEmail(createUserDto.email);
+    if (existingUser) {
+        throw new ConflictException('User already exists');
+    }
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-    try {
-      const user = await this.usersService.createUser({
+    const user = await this.usersService.createUser({
         ...createUserDto,
         password: hashedPassword,
-      });
-      return user;
-    } catch (error) {
-      throw new ConflictException('User already exists');
-    }
+    });
+    
+    delete user.password;
+    return user;
   }
 
   async login(email: string, password: string) {
