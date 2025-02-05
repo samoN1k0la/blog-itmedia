@@ -1,4 +1,23 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, Query, UseGuards, Request } from '@nestjs/common';
+import { 
+  Controller, 
+  Get, 
+  Post, 
+  Put, 
+  Delete, 
+  Param, 
+  Body, 
+  Query, 
+  UseGuards, 
+  Request,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage, Multer } from 'multer';
+import { extname, join } from 'path';
+import * as sharp from 'sharp';
+import { existsSync, mkdirSync, unlinkSync } from 'fs';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -19,6 +38,43 @@ export class PostsController {
     return this.postsService.getAllPosts(page, limit);
   }
 
+  @Post('upload-image')
+  @ApiOperation({ summary: 'Upload image for blog post' })
+  @UseInterceptors(FileInterceptor('image', {  
+    storage: diskStorage({
+      destination: './uploads',
+      filename: (req, file, callback) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const extension = extname(file.originalname);
+        callback(null, `original-${uniqueSuffix}${extension}`);
+      },
+    }),
+    limits: { fileSize: 5 * 1024 * 1024 },
+  }))
+  async uploadImage(@UploadedFile() file: Multer.File) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+
+    const filename = `resized-${Date.now()}.webp`;
+    const outputPath = join('./uploads', filename);
+    const originalPath = join('./uploads', file.filename);
+
+    try {
+      await sharp(file.path)
+        .resize(640)
+        .webp({ quality: 80 })
+        .toFile(outputPath);
+
+      unlinkSync(originalPath);
+
+      return { imageUrl: `http://localhost:4000/uploads/${filename}` };
+    } catch (error) {
+      console.error('Image processing error:', error);
+      throw new BadRequestException('Image processing failed');
+    }
+  } 
+
   @Get('search')
   @ApiOperation({ summary: 'Search for posts by title or content' })
   searchPosts(@Query('query') query: string) {
@@ -32,6 +88,7 @@ export class PostsController {
   @ApiOperation({ summary: 'Create a new post' })
   createPost(@Body() createPostDto: CreatePostDto, @Request() req: any) {
     const user = req.user;
+    console.log(user);
     return this.postsService.createPost(createPostDto, user);
   }
 
