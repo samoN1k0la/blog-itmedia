@@ -22,6 +22,19 @@ export class PostsService {
     return { posts, total };
   }
 
+  async getPostsByAuthor(
+    userId: number, 
+    page: number = 1, 
+    limit: number = 10
+  ): Promise<{ posts: Post[], total: number }> {
+    const [posts, total] = await this.postRepository.findAndCount({
+      where: { author_id: userId },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+    return { posts, total };
+  }
+
   async createPost(createPostDto: CreatePostDto, userReq: any): Promise<Post> {
     if (userReq.id == createPostDto.author_id || userReq.role == 'admin') {
       const newPost = this.postRepository.create(createPostDto);

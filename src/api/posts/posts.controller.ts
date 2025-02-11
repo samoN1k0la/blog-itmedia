@@ -81,6 +81,19 @@ export class PostsController {
       return this.postsService.searchPosts(query);
   }
 
+  @Get('my-posts')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Get posts for the authenticated author' })
+  async getMyPosts(
+    @Request() req: any, 
+    @Query('page') page: number = 1, 
+    @Query('limit') limit: number = 10
+  ) {
+    const user = req.user;
+    return this.postsService.getPostsByAuthor(user.id, page, limit);
+  }
+
   @Post()
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
