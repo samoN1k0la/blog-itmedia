@@ -17,4 +17,12 @@ export class UpdatePostDto {
   @IsOptional()
   @IsString()
   content?: string;
+
+  @ApiProperty({
+    description: 'The status of the post',
+    example: 'Draft',
+  })
+  @IsOptional()
+  @IsString()
+  status?: string;
 }

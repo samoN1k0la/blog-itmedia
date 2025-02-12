@@ -14,6 +14,9 @@ export class Post {
     @Column()
     author_id: number;
 
+    @Column()
+    status: string;
+
     @CreateDateColumn()
     createdAt: Date;
 

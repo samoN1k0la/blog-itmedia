@@ -25,4 +25,12 @@ export class CreatePostDto {
   @IsNotEmpty()
   @IsNumber()
   author_id: number;
+
+  @ApiPropert({
+    description: 'Status of the post',
+    example: 'Draft',
+  })
+  @IsNotEmpty()
+  @IsString()
+  status: string;
 }
