@@ -38,6 +38,18 @@ export class PostsController {
     return this.postsService.getAllPosts(page, limit);
   }
 
+  @Get('published')
+  @ApiOperation({ summary: 'Get all published posts' })
+  getAllPublishedPosts(@Query('page') page: number = 1, @Query('limit') limit: number = 10) {
+    return this.postsService.getAllPublishedPosts(page, limit);
+  }
+
+  @Get('heroes')
+  @ApiOperation({ summary: 'Get a certain number of heroes for the home page' })
+  getHeroes(@Query('limit') limit: number = 10) {
+    return this.postsService.getHeroes(limit);
+  }
+
   @Post('upload-image')
   @ApiOperation({ summary: 'Upload image for blog post' })
   @UseInterceptors(FileInterceptor('image', {  

@@ -17,6 +17,9 @@ export class Post {
     @Column()
     status: string;
 
+    @Column()
+    hero_url: string;
+
     @CreateDateColumn()
     createdAt: Date;
 

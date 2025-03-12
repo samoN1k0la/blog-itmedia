@@ -26,11 +26,19 @@ export class CreatePostDto {
   @IsNumber()
   author_id: number;
 
-  @ApiPropert({
+  @ApiProperty({
     description: 'Status of the post',
     example: 'Draft',
   })
   @IsNotEmpty()
   @IsString()
   status: string;
+
+  @ApiProperty({
+    description: 'The hero image URL of the post',
+    example: 'https://example.com/image.png',
+  })
+  @IsNotEmpty()
+  @IsString()
+  hero_url: string;
 }

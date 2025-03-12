@@ -22,6 +22,26 @@ export class PostsService {
     return { posts, total };
   }
 
+  async getAllPublishedPosts(page: number = 1, limit: number = 10): Promise<{ posts: Post[], total: number }> {
+    const [posts, total] = await this.postRepository.findAndCount({
+      where: { status: 'Published' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return { posts, total };
+  }
+
+  async getHeroes(limit: number = 10): Promise<{ posts: { id: number, title: string, author_id: number, hero_url: string }[], total: number }> {
+    const [posts, total] = await this.postRepository.findAndCount({
+      where: { status: 'Published' },
+      select: ['id', 'title', 'author_id', 'hero_url'],
+      take: limit,
+    });
+
+    return { posts, total };
+  }
+
   async getPostsByAuthor(
     userId: number, 
     page: number = 1, 

@@ -25,4 +25,12 @@ export class UpdatePostDto {
   @IsOptional()
   @IsString()
   status?: string;
+
+  @ApiProperty({
+    description: 'The hero image URL of the post',
+    example: 'https://example.com/image.png',
+  })
+  @IsOptional()
+  @IsString()
+  hero_url?: string;
 }
